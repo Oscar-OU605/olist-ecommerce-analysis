@@ -1,62 +1,67 @@
-# Olist 电商经营与履约分析
+[English](README.md) | [简体中文](README.zh-CN.md)
 
-基于 Olist 九张公开电商数据表，使用 MySQL 分析销售趋势、商品结构、买家复购、履约与评价，并检查多表关联导致的重复计算。
+# Olist E-commerce Sales and Delivery Analysis
 
-## 业务问题
-1. 已送达订单的商品金额、订单量和客单价是多少？
-2. 月度金额变化集中在哪些品类？订单量与客单价如何变化？
-3. 晚到订单和按时订单的评分分布有何区别？
-4. 观察期内买家复购占比是多少？原始数据有哪些质量问题？
+Analyze nine public Olist datasets using MySQL to examine sales trends, product categories, repeat purchases, delivery performance, and customer reviews, while preventing double counting across tables.
 
-## 数据与工具
-- 来源：[Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)
-- 九份CSV，99,441笔订单、112,650条商品明细；购买时间为2016-09至2018-10。
-- SQL：MySQL 8.0+，CTE、窗口函数、条件聚合和多表关联。
-- Python：用于原始CSV审计、Decimal精确金额和复购买家交叉核对。
-- 公开数据分析练习，不是任何企业的实际实习或线上业务项目。
+## Business questions
+1. What are delivered merchandise GMV, order volume, and average order value?
+2. Which categories contribute to monthly GMV changes? How do order volume and average order value change?
+3. How do review scores differ between late and on-time deliveries?
+4. What share of buyers make repeat purchases within the observation window, and what data quality issues affect the analysis?
 
-## 主要结果
-| 指标 | 结果 |
+## Data and tools
+- Source: [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce).
+- Nine CSVs with 99,441 orders and 112,650 order items; purchases span September 2016 to October 2018.
+- MySQL 8.0+: CTEs, window functions, conditional aggregation, and joins.
+- Python: raw-data audits, exact decimal GMV checks, and independent repeat-buyer checks.
+- A public-data portfolio project, with no claim of employment or production deployment.
+
+## Key results
+
+| Metric | Result |
 |---|---:|
-| 总订单 | 99,441 |
-| 已送达订单 | 96,478 |
-| 已送达商品GMV | BRL 13,221,498.11 |
-| 已送达客单价 | BRL 137.04 |
-| 观察期复购买家占比 | 3.00% |
-| 可判断订单的晚到率 | 6.77% |
-| 2018年6月GMV环比 | -12.43% |
+| Total orders | 99,441 |
+| Delivered orders | 96,478 |
+| Delivered merchandise GMV | BRL 13,221,498.11 |
+| Delivered average order value | BRL 137.04 |
+| Observed repeat-buyer share | 3.00% |
+| Late-delivery rate among eligible orders | 6.77% |
+| June 2018 month-over-month GMV change | -12.43% |
 
-晚到与按时订单的低评分比例为62.36%和9.23%。该差异表示相关性，不能认定因果。
+Low-score shares are 62.36% for late deliveries and 9.23% for on-time deliveries. This is an association, not evidence of causation.
 
-## 分析方法
-- 商品、支付、评价先各自汇总到订单层，再关联，防止金额被重复计算。
-- 用customer_unique_id识别跨订单买家。
-- GMV仅统计最终状态为delivered的商品price，不含运费，也不是利润或净收入。
-- 对缺失、重复、外键关系和支付差额进行独立检查。
-- 将2018年5—6月GMV变化拆分为订单量及客单价影响，并按品类分析算术贡献。
+## Approach
+- Aggregate items, payments, and reviews separately to one row per order before joining.
+- Use customer_unique_id to identify buyers across orders.
+- Define GMV as the sum of item prices for orders with final status delivered. Exclude freight; this is not profit or net revenue.
+- Check missing values, duplicates, foreign-key coverage, and payment reconciliation.
+- Decompose May–June 2018 GMV changes into order-volume and average-order-value effects, and calculate category contributions to the net change.
 
-## 文件结构
-- sql/ecommerce_analysis.sql：适配ecommerce_project及原CSV表名的一体SQL。
-- results/：13组分析及质量检查结果CSV。
-- docs/analysis_report.md：口径、发现和分析局限。
-- docs/schema_dictionary.md：字段、推断类型与缺失统计。
-- validation/：输入指纹、审计明细和本地独立核对记录。
+## Repository structure
+- sql/ecommerce_analysis.sql: one SQL script for ecommerce_project and the original CSV table names.
+- results/: outputs for 13 analysis queries and data quality checks.
+- docs/analysis_report.md: English report; docs/analysis_report.zh-CN.md: Chinese report.
+- docs/schema_dictionary.md: field names, inferred types, and missing-value counts (Chinese).
+- validation/: input hashes, audit details, and independent local validation records.
 
-## 运行
-1. 在MySQL 8.0+创建ecommerce_project数据库，并将九份原CSV导入为与文件同名（去掉.csv）的表。
-2. 在MySQL Workbench打开sql/ecommerce_analysis.sql。
-3. 按第0步至第6步分段执行。第2步matches_original应全部为1。
-4. 第5步输出13组分析。将自己的结果与results/核对。
-5. 源表保持不变；脚本创建或更新v_oa_前缀视图。
+## How to run
+1. Create ecommerce_project in MySQL 8.0+ and import the nine original CSVs into tables named after the files, without the .csv extension.
+2. Open sql/ecommerce_analysis.sql in MySQL Workbench.
+3. Execute Steps 0–6 in sequence. All matches_original values in Step 2 should equal 1.
+4. Step 5 produces 13 analysis outputs. Compare your results with results/.
+5. Source tables remain unchanged; the script creates or replaces views prefixed with v_oa_.
 
-## 验证与结果来源
-- 项目作者已确认在本机MySQL完成验证；仓库尚未包含该次MySQL运行日志或截图。
-- results/为制作项目时从原CSV实际计算并导出的结果，使用SQLite执行分析查询，并适配DATE_FORMAT、DATEDIFF；它们不是作者本机MySQL会话直接导出的文件。
-- validation/verification.json保留该独立本地验证事实，mysql_server_execution=false仅描述此验证过程，不否定作者后续完成的MySQL验证。
-- Decimal精确核对GMV、独立分组核对复购买家，以及订单粒度/品类金额守恒均通过。
-- 项目使用AI辅助编写SQL及整理文档。
+The shared SQL script contains Chinese guidance and English query comments. Both README versions use the same SQL and result files.
 
-## 局限
-没有曝光、点击、退款事件、成本或实验分组，不能计算真实转化漏斗、退款率、利润、ROI或实验因果效果。复购占比受观察期影响，不是固定期限留存。2018年9—10月尾部样本不能解释为业务突然下滑。金额按BRL解释，CSV无独立币种字段。
+## Validation and output provenance
+- The project author confirmed successful validation in their local MySQL environment. That session's logs and screenshots are not included.
+- The CSVs in results/ were calculated from the original data during project preparation using SQLite with DATE_FORMAT and DATEDIFF adapters. They are not direct exports of the author's MySQL session.
+- validation/verification.json records that independent local check. Its mysql_server_execution=false describes that check, not the author's subsequent MySQL validation.
+- Exact decimal GMV checks, independent repeat-buyer checks, order-grain checks, and category-total reconciliation passed.
+- AI assisted with SQL development and documentation.
 
-原始数据未随仓库重复分发，请从数据发布页获取，并遵守原数据许可。未对原始数据另授许可。
+## Limitations
+The data lacks impressions, clicks, refund events, costs, and experimental assignments. It cannot support a complete conversion funnel, refund rates, profit, ROI, or experimental causal claims. Observed repeat purchasing is not fixed-horizon retention. Sparse September–October 2018 records should not be interpreted as a sudden business decline. Amounts are interpreted as BRL; the CSVs contain no separate currency field.
+
+Raw data is not redistributed here. Obtain it from the source and follow its original license. No new license is granted for the source data.

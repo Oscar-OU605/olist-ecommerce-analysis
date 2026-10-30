@@ -1,30 +1,32 @@
-# 分析报告
+[English](analysis_report.md) | [简体中文](analysis_report.zh-CN.md)
 
-## 指标口径
-GMV为最终状态delivered订单的商品项price合计，不含运费；客单价为该金额除以已送达订单数。以购买月份统计月趋势。支付记录金额与商品金额口径不同，不能混用。
+# Analysis Report
 
-买家使用customer_unique_id。复购买家为观察期内至少两笔已送达订单的买家。晚到按实际送达日期晚于预计日期判断；缺实际送达时间的8笔已送达订单不参与分母。低评分定义为订单内平均评分≤2，每笔订单等权。
+## Metric definitions
+GMV is the sum of item prices for orders whose final status is delivered, excluding freight. Average order value is that GMV divided by delivered orders. Monthly trends use the purchase month. Recorded payment amounts and merchandise value have different scopes and must not be used interchangeably.
 
-## 质量检查
-- 地理表有261,831条完全重复记录，邮编不是唯一键，关联前需去重并汇总。
-- 2,961笔订单有多条支付记录，547笔有多评价；商品/支付/评价先汇总再关联。
-- 六条核心外键关系孤儿行均为0；商品类别存在缺失和未翻译映射。
-- 775笔订单无商品项、1笔无支付、768笔无评价；保留并按状态检查。
-- 商品类目缺失610个；13个商品属于两个无英文映射类目。
-- 有明细且有支付的订单中，303单的支付与商品额加运费的差异绝对值大于BRL 0.01，原因待进一步业务字段核实。
+Buyers are identified using customer_unique_id. A repeat buyer has at least two delivered orders within the observation window. An order is late when its actual delivery date is later than its estimated date; eight delivered orders without an actual delivery timestamp are excluded. Low scores mean an average review score of 2 or less within an order. Orders receive equal weight.
 
-## 发现
-1. 已送达订单96,478笔，商品GMV为BRL 13,221,498.11，客单价BRL 137.04。
-2. health_beauty、watches_gifts、bed_bath_table分别占已送达商品金额9.33%、8.82%、7.74%。无成本数据，不能由此推断利润。
-3. 2018年5→6月GMV为BRL 977,544.69→856,077.86，环比-12.43%；订单数6,749→6,099，客单价BRL 144.84→140.36。
-4. watches_gifts金额减少BRL 34,337.41，对全类目净降幅算术贡献28.27%。这是结构拆分，不是因果归因。
-5. 96,470笔可判断履约的订单中晚到6,534笔，占6.77%。晚到/按时组低评分比例分别为62.36%/9.23%，应进一步按地区、月份、品类分层核查。
-6. 已送达买家93,358人，复购买家2,801人，观察期复购占比3.00%。
+## Data quality
+- The geolocation table contains 261,831 excess exact duplicate rows. ZIP prefixes are not unique; deduplicate and aggregate before joining.
+- There are 2,961 orders with multiple payment records and 547 with multiple reviews. Aggregate each detail table to order level before joining.
+- No orphan rows were found across six core foreign-key relationships. Product category information and translations have missing values.
+- There are 775 orders without items, one without a payment, and 768 without reviews; retain them and inspect by status.
+- Categories are missing for 610 products; another 13 products belong to two categories without English mappings.
+- Among orders with items and payments, 303 have an absolute difference greater than BRL 0.01 between recorded payments and merchandise plus freight. Further business information is needed to explain these differences.
 
-## 建议与后续
-优先对核心品类建立月度金额、订单、客单价与履约监测。对6月波动补充流量、库存和活动数据，区分订单量与客单价变化。对晚到集中地区和卖家分层排查，不能直接把订单晚到归责给某一卖家。
+## Findings
+1. There are 96,478 delivered orders, with merchandise GMV of BRL 13,221,498.11 and average order value of BRL 137.04.
+2. health_beauty, watches_gifts, and bed_bath_table account for 9.33%, 8.82%, and 7.74% of delivered merchandise GMV. These shares do not imply profitability.
+3. From May to June 2018, GMV falls from BRL 977,544.69 to BRL 856,077.86 (-12.43%); delivered orders fall from 6,749 to 6,099, and average order value from BRL 144.84 to BRL 140.36.
+4. watches_gifts declines by BRL 34,337.41, contributing 28.27% of the net category decline. This is an arithmetic decomposition, not causal attribution.
+5. Of 96,470 delivery-eligible orders, 6,534 arrive late (6.77%). Low-score shares for late and on-time groups are 62.36% and 9.23%. Further stratification by region, month, and category is needed.
+6. There are 93,358 delivered-order buyers and 2,801 repeat buyers, giving an observed repeat-buyer share of 3.00%.
 
-公开数据缺少曝光点击、退款、成本、实验分组；不能报告转化率、利润、ROI或真实业务提升。边界月份及买家观察时长会影响结论。
+## Recommendations and next steps
+Monitor monthly GMV, orders, average order value, and delivery performance for major categories. Supplement June's changes with traffic, inventory, and campaign information. Investigate delivery patterns by destination and seller, without automatically assigning a multi-seller order's delay to an individual seller.
 
-## 验证
-作者已确认本机MySQL验证完成。仓库results/保留项目制作阶段实际计算的参考输出，来源为SQLite加日期函数适配，非该MySQL会话直接导出。金额另经Decimal精确求和核对，复购经独立分组核对。详见README与validation/。
+The dataset lacks traffic events, refunds, costs, and experimental assignments. It cannot demonstrate conversion rates, profit, ROI, or realized business improvements. Boundary months and unequal buyer observation windows affect interpretation.
+
+## Validation
+The author confirmed local MySQL validation. Repository result CSVs retain the actual reference outputs generated during project preparation using SQLite with date-function adapters; they are not exports from that MySQL session. GMV was independently checked using exact decimal summation, and repeat buyers using separate grouping. See the README and validation/ for details.
