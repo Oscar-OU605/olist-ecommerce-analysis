@@ -1,0 +1,56 @@
+{
+  "key_duplicate_excess": {
+    "orders": 0,
+    "customers": 0,
+    "products": 0,
+    "sellers": 0,
+    "order_items": 0,
+    "order_payments": 0,
+    "category_translation": 0
+  },
+  "orphans": {
+    "orders.customer_id -> customers.customer_id": 0,
+    "order_items.order_id -> orders.order_id": 0,
+    "order_items.product_id -> products.product_id": 0,
+    "order_items.seller_id -> sellers.seller_id": 0,
+    "order_payments.order_id -> orders.order_id": 0,
+    "order_reviews.order_id -> orders.order_id": 0,
+    "products.product_category_name -> category_translation.product_category_name": 13
+  },
+  "orders_without_items": 775,
+  "orders_without_payments": 1,
+  "orders_without_reviews": 768,
+  "review_id_duplicate_excess": 814,
+  "review_id_order_id_duplicate_excess": 0,
+  "orders_with_multiple_reviews": 547,
+  "orders_with_multiple_payments": 2961,
+  "geo_distinct_zip": 19015,
+  "geo_zip_multiple_states": 8,
+  "negative_item_prices": 0,
+  "negative_freight": 0,
+  "zero_item_prices": 0,
+  "negative_payments": 0,
+  "zero_payments": 9,
+  "zero_installments": 2,
+  "invalid_review_scores": 0,
+  "purchase_min": "2016-09-04 21:15:19",
+  "purchase_max": "2018-10-17 17:30:18",
+  "delivered_missing_delivery": 8,
+  "date_parse_failures": {
+    "order_items.shipping_limit_date": 0,
+    "orders.order_purchase_timestamp": 0,
+    "orders.order_approved_at": 0,
+    "orders.order_delivered_carrier_date": 0,
+    "orders.order_delivered_customer_date": 0,
+    "orders.order_estimated_delivery_date": 0,
+    "order_reviews.review_creation_date": 0,
+    "order_reviews.review_answer_timestamp": 0
+  },
+  "delivery_before_purchase": 0,
+  "product_untranslated_categories": [
+    "pc_gamer",
+    "portateis_cozinha_e_preparadores_de_alimentos"
+  ],
+  "geo_missing_customer_zip_rows": 278,
+  "geo_missing_seller_zip_rows": 7
+}

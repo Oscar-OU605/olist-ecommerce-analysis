@@ -1,0 +1,9 @@
+﻿order_status,orders,item_value,no_item_orders,no_payment_orders
+delivered,96478,13221498.11,0,1
+shipped,1107,150727.44,1,0
+canceled,625,95235.27,164,0
+unavailable,609,2007.69,603,0
+invoiced,314,61526.37,2,0
+processing,301,60439.22,0,0
+created,5,0.0,5,0
+approved,2,209.6,0,0

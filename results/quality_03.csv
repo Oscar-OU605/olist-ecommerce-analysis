@@ -1,0 +1,11 @@
+﻿check_name,n
+delivered_no_delivery_date,8
+orders_no_items,775
+orders_no_payment,1
+orders_no_review,768
+product_no_category,610
+negative_price_or_freight,0
+zero_payment,9
+zero_installments,2
+invalid_review_score,0
+delivery_before_purchase,0

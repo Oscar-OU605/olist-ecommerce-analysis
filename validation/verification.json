@@ -1,0 +1,9 @@
+{
+  "engine": "SQLite 3.53.1",
+  "mysql_server_execution": false,
+  "queries_run": 13,
+  "independent_decimal_delivered_gmv": "13221498.11",
+  "repeat_buyer_check": 2801,
+  "fact_grain_and_category_total_checks": "passed",
+  "input_hashes": "all matched"
+}
